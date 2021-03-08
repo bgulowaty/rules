@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "rules-classification"
+version = "0.1.0"
+description = ""
+authors = ["Bogdan Gulowaty <b.gulowaty@gmail.com>"]
+include = ["rules"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+rules-api = { path = "../rules-api" }
+numpy = "^1.20.1"
+pandas = "^1.2.3"
+deap = "^1.3.1"
+sympy = "^1.7.1"
+toolz = "^0.11.1"
+pytest = "^6.2.2"
+joblib = "^1.0.1"
+sklearn = "^0.0"
+loguru = "^0.5.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
