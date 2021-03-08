@@ -30,8 +30,8 @@ python-versions = ">=3.5"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
-content-hash = "0cc8b05c35134060177bf58183851b269975f92cc8ce391b321981d31e0c8a00"
+python-versions = "^3.8"
+content-hash = "4775b7006345724b9b8ac57377f537dc1b4cd9fc9951b9354f339ba38ad7ac6e"
 
 [metadata.files]
 attrs = [

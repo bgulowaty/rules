@@ -1,11 +1,14 @@
 [tool.poetry]
 name = "sklearn-decision-tree"
 version = "0.1.0"
-description = ""
+description = "SKlearn binding for rules."
 authors = ["Bogdan Gulowaty <b.gulowaty@gmail.com>"]
+packages = [
+    { include = "rules" },
+]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 rules-api = { path = "../rules-api" }
 attrs = "^20.3.0"
 sklearn = "^0.0"
