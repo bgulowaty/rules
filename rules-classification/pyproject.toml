@@ -9,7 +9,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-rules-api = { path = "../rules-api/", develop = true }
 numpy = "^1.20.1"
 pandas = "^1.2.3"
 deap = "^1.3.1"

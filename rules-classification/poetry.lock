@@ -185,24 +185,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "rules-api"
-version = "0.1.0"
-description = "Rules API for rules project."
-category = "main"
-optional = false
-python-versions = "^3.8"
-develop = true
-
-[package.dependencies]
-attrs = "^20.3.0"
-joblib = "^1.0.1"
-toolz = "^0.11.1"
-
-[package.source]
-type = "directory"
-url = "../rules-api"
-
-[[package]]
 name = "scikit-learn"
 version = "0.24.1"
 description = "A set of python modules for machine learning and data mining"
@@ -301,7 +283,7 @@ dev = ["pytest (>=4.6.2)", "black (>=19.3b0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "73c93290f6306f8cb97ad554a8d341da4554e404337d5dc6ea3829ca8753ed72"
+content-hash = "13a972d7a553700bc174c64d2d410178d2a6246658c785945926f1570ca2324b"
 
 [metadata.files]
 atomicwrites = [
@@ -438,7 +420,6 @@ pytz = [
     {file = "pytz-2021.1-py2.py3-none-any.whl", hash = "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"},
     {file = "pytz-2021.1.tar.gz", hash = "sha256:83a4a90894bf38e243cf052c8b58f381bfe9a7a483f6a9cab140bc7f702ac4da"},
 ]
-rules-api = []
 scikit-learn = [
     {file = "scikit-learn-0.24.1.tar.gz", hash = "sha256:a0334a1802e64d656022c3bfab56a73fbd6bf4b1298343f3688af2151810bbdf"},
     {file = "scikit_learn-0.24.1-cp36-cp36m-macosx_10_13_x86_64.whl", hash = "sha256:9bed8a1ef133c8e2f13966a542cb8125eac7f4b67dcd234197c827ba9c7dd3e0"},
