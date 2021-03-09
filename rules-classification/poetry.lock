@@ -191,7 +191,7 @@ description = "Rules API for rules project."
 category = "main"
 optional = false
 python-versions = "^3.8"
-develop = false
+develop = true
 
 [package.dependencies]
 attrs = "^20.3.0"
@@ -301,7 +301,7 @@ dev = ["pytest (>=4.6.2)", "black (>=19.3b0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2c7884e7d55250fdd8e36b70ae708d77c31453a820cf8503823f13655db46c6f"
+content-hash = "73c93290f6306f8cb97ad554a8d341da4554e404337d5dc6ea3829ca8753ed72"
 
 [metadata.files]
 atomicwrites = [
