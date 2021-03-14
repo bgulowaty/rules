@@ -6,7 +6,7 @@ from ..nnge.nnge import Hyperrectangle, Statement as HyperrectStatement, Feature
 from toolz.curried import pipe, map, filter
 import numpy as np
 
-from ..classification.classification import to_instance
+from rules.classification.utils import to_instance
 from .utils import EPS
 
 

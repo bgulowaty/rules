@@ -18,6 +18,7 @@ pytest = "^6.2.2"
 joblib = "^1.0.1"
 sklearn = "^0.0"
 loguru = "^0.5.3"
+networkx = "^2.5"
 
 [tool.poetry.dev-dependencies]
 

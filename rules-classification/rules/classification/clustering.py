@@ -5,20 +5,12 @@ from itertools import product
 
 
 def get_rule_edges(rule: Rule):
-    if not rule.is_bounded():
-        raise Exception("Only bounded rules supported")
 
     points_by_feature = defaultdict(list)
     for statement in rule.statements:
         points_by_feature[statement.feature_idx].append(statement.threshold)
 
     return set(map(tuple, product(*sorted(points_by_feature.values()))))
-
-
-def get_rule_middles(rule: Rule):
-    if not rule.is_bounded():
-        raise Exception("Only bounded rules supported")
-
 
 
 def test_get_rule_corners():

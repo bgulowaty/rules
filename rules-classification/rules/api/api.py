@@ -20,6 +20,7 @@ class Feature:
     index: int
     name: str
 
+
 @attrs(auto_attribs=True, frozen=True)
 class Statement:
     feature_idx: int
@@ -42,6 +43,7 @@ class Statement:
         is_same_idx = self.feature_idx == statement.feature_idx
 
         return is_same_idx and self.contains(statement.threshold)
+
 
 @attrs(auto_attribs=True, frozen=True)
 class Instance:
@@ -67,7 +69,7 @@ class Rule:
 
     def get_statements_by_feature(self) -> Dict[int, Set[Statement]]:
         return {feature: list(statements) for feature, statements in
-                                       groupby(sorted(self.statements, key=lambda s: s.feature_idx), lambda statement: statement.feature_idx)}
+                groupby(sorted(self.statements, key=lambda s: s.feature_idx), lambda statement: statement.feature_idx)}
 
     def get_features(self) -> Set[int]:
         return pipe(

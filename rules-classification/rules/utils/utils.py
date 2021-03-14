@@ -5,7 +5,7 @@ from typing import Set, Collection
 from toolz.curried import pipe, filter, map, reduce
 
 from rules.api import Rule, Relation, Statement
-from ..classification.classification import to_instance
+from rules.classification.utils import to_instance
 
 
 EPS = np.finfo(float).eps
