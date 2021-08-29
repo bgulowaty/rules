@@ -20,6 +20,7 @@ class Feature:
     index: int
     name: str
 
+
 @attrs(auto_attribs=True, frozen=True)
 class Statement:
     feature_idx: int
@@ -43,6 +44,7 @@ class Statement:
 
         return is_same_idx and self.contains(statement.threshold)
 
+
 @attrs(auto_attribs=True, frozen=True)
 class Instance:
     value_by_feature_idx: Dict[int, float]
@@ -55,7 +57,9 @@ class Rule:
 
     def __hash__(self) -> int:
         if isinstance(self.distribution_or_class, dict):
-            return hash((self.statements, frozenset(self.distribution_or_class.items())))
+            return hash(
+                (self.statements, frozenset(self.distribution_or_class.items()))
+            )
 
         return hash((self.statements, self.distribution_or_class))
 
@@ -66,35 +70,42 @@ class Rule:
         return self.distribution_or_class
 
     def get_statements_by_feature(self) -> Dict[int, Set[Statement]]:
-        return {feature: list(statements) for feature, statements in
-                                       groupby(sorted(self.statements, key=lambda s: s.feature_idx), lambda statement: statement.feature_idx)}
+        return {
+            feature: list(statements)
+            for feature, statements in groupby(
+                sorted(self.statements, key=lambda s: s.feature_idx),
+                lambda statement: statement.feature_idx,
+            )
+        }
 
     def get_features(self) -> Set[int]:
-        return pipe(
-            self.statements,
-            map(lambda statement: statement.feature_idx),
-            set
-        )
+        return pipe(self.statements, map(lambda statement: statement.feature_idx), set)
 
     def get_statements_for_feature(self, feature_idx: int) -> Set[Statement]:
         return pipe(
             self.statements,
             filter(lambda statement: statement.feature_idx == feature_idx),
-            set
+            set,
         )
 
     def describes(self, instance: Instance) -> bool:
         each_statement_covers_any_instances_feature = True
         for statement in self.statements:
             statement_covers_any_instances_feature = any(
-                [statement.covers(feature_idx, value) for feature_idx, value in instance.value_by_feature_idx.items()])
-            each_statement_covers_any_instances_feature = False if statement_covers_any_instances_feature is False \
+                [
+                    statement.covers(feature_idx, value)
+                    for feature_idx, value in instance.value_by_feature_idx.items()
+                ]
+            )
+            each_statement_covers_any_instances_feature = (
+                False
+                if statement_covers_any_instances_feature is False
                 else each_statement_covers_any_instances_feature
+            )
         return each_statement_covers_any_instances_feature
 
 
 class DecisionTree(ABC):
-
     @abstractmethod
     def get_rules(self) -> Set[Rule]:
         raise NotImplementedError()
@@ -111,11 +122,18 @@ class Features:
         return Feature(index, self._feature_name_by_index[index])
 
     def get_all(self) -> Tuple[Feature]:
-        return tuple([Feature(index, feature) for index, feature in self._feature_name_by_index.items()])
+        return tuple(
+            [
+                Feature(index, feature)
+                for index, feature in self._feature_name_by_index.items()
+            ]
+        )
 
 
-class AdjacentOrNot(Enum):  # TODO(bgulowaty): replace with Literal[true,false] in Python 3.8
-    ADJACENT = True,
+class AdjacentOrNot(
+    Enum
+):  # TODO(bgulowaty): replace with Literal[true,false] in Python 3.8
+    ADJACENT = (True,)
     NOT_ADJACENT = False
 
     def as_number(self):
@@ -123,7 +141,6 @@ class AdjacentOrNot(Enum):  # TODO(bgulowaty): replace with Literal[true,false] 
 
 
 class RulesAdjacencyMeasurer(ABC):
-
     @abstractmethod
     def measure(self, rule1: Rule, rule2: Rule) -> AdjacentOrNot:
         raise NotImplementedError

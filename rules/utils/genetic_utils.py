@@ -18,28 +18,20 @@ def get_rules_statements(rules):
 def statements_individual_creator(rules: List[Rule]):
     statements = get_rules_statements(rules)
 
-    statements_vector = pipe(
-        statements,
-        map(lambda s: s.threshold),
-        list,
-        np.array
-    )
+    statements_vector = pipe(statements, map(lambda s: s.threshold), list, np.array)
     return creator.Individual(statements_vector)
 
 
 def statements_and_enablements_individual_creator(rules: List[Rule]):
     statements = get_rules_statements(rules)
 
-    statements_vector = pipe(
-        statements,
-        map(lambda s: s.threshold),
-        list,
-        np.array
-    )
+    statements_vector = pipe(statements, map(lambda s: s.threshold), list, np.array)
 
     enablement_vector = [0 for _ in rules]
 
-    return creator.Individual(np.concatenate((statements_vector, enablement_vector), axis=0))
+    return creator.Individual(
+        np.concatenate((statements_vector, enablement_vector), axis=0)
+    )
 
 
 def enablement_vector(statement: List[any]):
@@ -47,18 +39,20 @@ def enablement_vector(statement: List[any]):
 
     return creator.Individual(vector)
 
+
 def enablement_vector_mutation(vector, proba=0.1):
     flip = lambda val: 0 if val == 1 else 1
 
-    return np.array([
-        flip(item) if random.random() <= proba else item for item in vector
-    ])
+    return np.array(
+        [flip(item) if random.random() <= proba else item for item in vector]
+    )
 
 
 def mutate_only_statements_mutation(individual, single_statement_mutation):
     mutated_statements = mutate_all_statements(individual, single_statement_mutation)
 
     return (creator.Individual(mutated_statements),)
+
 
 def mutate_all_statements(statements_vector, single_statement_mutation):
     statements_vector_iter = iter(statements_vector)
@@ -87,32 +81,41 @@ def mutate_all_statements(statements_vector, single_statement_mutation):
 
     return mutated_statements
 
-def statements_enablement_mutations(individual, statements_vector_size, single_statement_mutation,
-                                    enablement_vector_mutation=enablement_vector_mutation):
+
+def statements_enablement_mutations(
+    individual,
+    statements_vector_size,
+    single_statement_mutation,
+    enablement_vector_mutation=enablement_vector_mutation,
+):
     statements_vector = individual[:statements_vector_size]
     enablement_vector = individual[statements_vector_size:]
 
-    mutated_statements = mutate_all_statements(statements_vector, single_statement_mutation)
-
-    return (creator.Individual(
-        np.concatenate((mutated_statements, enablement_vector_mutation(enablement_vector)), axis=0)),)
-
-
-def statements_and_labels_individual_creator(statements: List[Statement], rules: List[Rule]):
-    statements_vector = pipe(
-        statements,
-        map(lambda s: s.threshold),
-        list,
-        np.array
+    mutated_statements = mutate_all_statements(
+        statements_vector, single_statement_mutation
     )
+
+    return (
+        creator.Individual(
+            np.concatenate(
+                (mutated_statements, enablement_vector_mutation(enablement_vector)),
+                axis=0,
+            )
+        ),
+    )
+
+
+def statements_and_labels_individual_creator(
+    statements: List[Statement], rules: List[Rule]
+):
+    statements_vector = pipe(statements, map(lambda s: s.threshold), list, np.array)
     classes_vector = pipe(
-        rules,
-        map(lambda rule: rule.classified_class),
-        list,
-        np.array
+        rules, map(lambda rule: rule.classified_class), list, np.array
     )
 
-    return creator.Individual(np.concatenate((statements_vector, classes_vector), axis=0))
+    return creator.Individual(
+        np.concatenate((statements_vector, classes_vector), axis=0)
+    )
 
 
 def label_vector_mutation(label_vector, available_labels, prob=0.5):
@@ -127,11 +130,28 @@ def label_vector_mutation(label_vector, available_labels, prob=0.5):
     return new_label_vector
 
 
-def mutation(individual, statements_vector_size, available_labels, single_statement_mutation, label_vector_mutation):
+def mutation(
+    individual,
+    statements_vector_size,
+    available_labels,
+    single_statement_mutation,
+    label_vector_mutation,
+):
     statements_vector = individual[:statements_vector_size]
     lables_vector = individual[statements_vector_size:]
 
-    mutated_statements = mutate_all_statements(statements_vector, single_statement_mutation)
+    mutated_statements = mutate_all_statements(
+        statements_vector, single_statement_mutation
+    )
 
-    return (creator.Individual(
-        np.concatenate((mutated_statements, label_vector_mutation(lables_vector, available_labels)), axis=0)),)
+    return (
+        creator.Individual(
+            np.concatenate(
+                (
+                    mutated_statements,
+                    label_vector_mutation(lables_vector, available_labels),
+                ),
+                axis=0,
+            )
+        ),
+    )

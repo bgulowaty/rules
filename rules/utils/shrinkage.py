@@ -38,19 +38,26 @@ class Rectangle:
         return all(covers_for_feature)
 
     def get_size(self) -> float:
-        return pipe(self.feature_by_bounds.values(),
-                    map(lambda bound: bound.upper - bound.lower),
-                    reduce(lambda x, y: x * y)
-                    )
+        return pipe(
+            self.feature_by_bounds.values(),
+            map(lambda bound: bound.upper - bound.lower),
+            reduce(lambda x, y: x * y),
+        )
 
     def get_feature_by_bounds_range(self) -> Dict[int, float]:
-        return {feature: bound.upper - bound.lower for feature, bound in self.feature_by_bounds.items()}
+        return {
+            feature: bound.upper - bound.lower
+            for feature, bound in self.feature_by_bounds.items()
+        }
 
     def is_inside(self, other: Rectangle):
         features = self.feature_by_bounds.keys()
-        return all([
-            self.feature_by_bounds[feature].inside(other.feature_by_bounds[feature])
-            for feature in features])
+        return all(
+            [
+                self.feature_by_bounds[feature].inside(other.feature_by_bounds[feature])
+                for feature in features
+            ]
+        )
 
 
 def calculate_overlapping_area(rect1: Rectangle, rect2: Rectangle) -> float:
@@ -62,14 +69,20 @@ def calculate_overlapping_area(rect1: Rectangle, rect2: Rectangle) -> float:
         rect1_bounds = rect1.feature_by_bounds[feature]
         rect2_bounds = rect2.feature_by_bounds[feature]
 
-        if rect1_bounds.lower <= rect2_bounds.lower and rect1_bounds.upper >= rect2_bounds.upper:
-            this_feature_area = (rect2_bounds.upper - rect2_bounds.lower)
-        elif rect2_bounds.lower <= rect1_bounds.lower and rect2_bounds.upper >= rect1_bounds.upper:
-            this_feature_area = (rect1_bounds.upper - rect1_bounds.lower)
+        if (
+            rect1_bounds.lower <= rect2_bounds.lower
+            and rect1_bounds.upper >= rect2_bounds.upper
+        ):
+            this_feature_area = rect2_bounds.upper - rect2_bounds.lower
+        elif (
+            rect2_bounds.lower <= rect1_bounds.lower
+            and rect2_bounds.upper >= rect1_bounds.upper
+        ):
+            this_feature_area = rect1_bounds.upper - rect1_bounds.lower
         elif rect1_bounds.upper >= rect2_bounds.lower >= rect1_bounds.lower:
-            this_feature_area = (rect1_bounds.upper - rect2_bounds.lower)
+            this_feature_area = rect1_bounds.upper - rect2_bounds.lower
         elif rect2_bounds.upper >= rect1_bounds.lower >= rect2_bounds.lower:
-            this_feature_area = (rect2_bounds.upper - rect1_bounds.lower)
+            this_feature_area = rect2_bounds.upper - rect1_bounds.lower
 
         if this_feature_area == 0:
             return 0
@@ -90,50 +103,77 @@ def shrink_rules(rects: Collection[Rectangle], overlapping_limit=0.5):
     rect_combinations = list(combinations(rects, 2))
     rect_combination_with_overlapping_size = pipe(
         rect_combinations,
-        map(lambda rect_combination: (rect_combination, calculate_overlapping_area(*rect_combination))),
-        dict
+        map(
+            lambda rect_combination: (
+                rect_combination,
+                calculate_overlapping_area(*rect_combination),
+            )
+        ),
+        dict,
     )
 
     # delete too big overlappings or nested
     to_delete = set()
     for rect1, rect2 in rect_combinations:
-        overlapping_size = get_overlapping_size_from_dict(rect1, rect2, rect_combination_with_overlapping_size)
+        overlapping_size = get_overlapping_size_from_dict(
+            rect1, rect2, rect_combination_with_overlapping_size
+        )
         if overlapping_size == 0:
             continue
 
         rects_with_size = {rect: rect.get_size() for rect in [rect1, rect2]}
-        rects_with_overlapping_ratio = {rect: overlapping_size / rect.get_size() for rect in [rect1, rect2]}
+        rects_with_overlapping_ratio = {
+            rect: overlapping_size / rect.get_size() for rect in [rect1, rect2]
+        }
 
         sorted_by_size = sorted(rects_with_size, key=rects_with_size.get, reverse=True)
 
-        if any([ratio >= overlapping_limit for ratio in rects_with_overlapping_ratio.values()]):
+        if any(
+            [
+                ratio >= overlapping_limit
+                for ratio in rects_with_overlapping_ratio.values()
+            ]
+        ):
             to_delete.add(sorted_by_size[0])
-            logging.debug(f"Deleting rect {sorted_by_size[0]} because of ratio {rects_with_overlapping_ratio.values()}")
+            logging.debug(
+                f"Deleting rect {sorted_by_size[0]} because of ratio {rects_with_overlapping_ratio.values()}"
+            )
         elif rect1.is_inside(rect2) or rect2.is_inside(rect1):
             to_delete.add(sorted_by_size[0])
-            logging.debug(f"Deleting rect {sorted_by_size[0]} because of its inside/covers another")
+            logging.debug(
+                f"Deleting rect {sorted_by_size[0]} because of its inside/covers another"
+            )
 
     # shrink leftovers
     rects_after_deletion = set(rects).difference(to_delete)
     logging.info(f"Rules to delete size={len(to_delete)}")
     logging.info(f"Rects after deletion={len(rects_after_deletion)}")
     rect_combination_with_overlapping_size = {
-        rules_tuple: overlapping_size for rules_tuple, overlapping_size in
-        rect_combination_with_overlapping_size.items()
-        if rules_tuple[0] in rects_after_deletion and rules_tuple[1] in rects_after_deletion
+        rules_tuple: overlapping_size
+        for rules_tuple, overlapping_size in rect_combination_with_overlapping_size.items()
+        if rules_tuple[0] in rects_after_deletion
+        and rules_tuple[1] in rects_after_deletion
     }
 
-    while any([val for val in rect_combination_with_overlapping_size.values() if val != 0]):
+    while any(
+        [val for val in rect_combination_with_overlapping_size.values() if val != 0]
+    ):
         for rect1, rect2 in rect_combination_with_overlapping_size.keys():
             shrink_on_biggest_feature(rect1, rect2)
 
         rect_combination_with_overlapping_size = pipe(
             rect_combination_with_overlapping_size,
-            map(lambda rect_combination: (rect_combination, calculate_overlapping_area(*rect_combination))),
-            dict
+            map(
+                lambda rect_combination: (
+                    rect_combination,
+                    calculate_overlapping_area(*rect_combination),
+                )
+            ),
+            dict,
         )
 
     return rects_after_deletion
+
 
 def extend(rectangles: Collection[Rectangle], X_train) -> Collection[Rectangle]:
     extended_rectangles = list(deepcopy(rectangles))
@@ -144,28 +184,37 @@ def extend(rectangles: Collection[Rectangle], X_train) -> Collection[Rectangle]:
             if len(candidates) == 0:
                 logging.debug(f"No candidates for {x}")
                 extended_rectangles.append(
-                    Rectangle({
-                        feature_idx: Bounds(val-EPS, val) for feature_idx, val in enumerate(x)
-                    })
+                    Rectangle(
+                        {
+                            feature_idx: Bounds(val - EPS, val)
+                            for feature_idx, val in enumerate(x)
+                        }
+                    )
                 )
             else:
                 candidate_with_size = {
                     candidate: candidate.extended.get_size() for candidate in candidates
                 }
 
-                biggest_candidate = max(candidate_with_size, key=candidate_with_size.get)
+                biggest_candidate = max(
+                    candidate_with_size, key=candidate_with_size.get
+                )
 
                 extended_rectangles.remove(biggest_candidate.original)
                 extended_rectangles.append(biggest_candidate.extended)
 
     return extended_rectangles
 
+
 @attrs(auto_attribs=True, hash=True, eq=True)
 class Candidate:
     original: Rectangle
     extended: Rectangle
 
-def find_possible_extensions(rectangles: Collection[Rectangle], single_example) -> List[Candidate]:
+
+def find_possible_extensions(
+    rectangles: Collection[Rectangle], single_example
+) -> List[Candidate]:
     features = list(range(len(single_example)))
     candidates = []
     for feature in features:
@@ -176,26 +225,42 @@ def find_possible_extensions(rectangles: Collection[Rectangle], single_example) 
 
             bounds = rectangle.feature_by_bounds[feature]
             if example_feature_value < bounds.lower:
-                this_rectangle_feature_bounds[feature] = Bounds(example_feature_value-EPS, bounds.upper)
+                this_rectangle_feature_bounds[feature] = Bounds(
+                    example_feature_value - EPS, bounds.upper
+                )
                 possible_candidate = Rectangle(this_rectangle_feature_bounds)
 
                 overlapping_areas = [
-                    calculate_overlapping_area(possible_candidate, other_rect) for other_rect in rectangles_without_this_one
+                    calculate_overlapping_area(possible_candidate, other_rect)
+                    for other_rect in rectangles_without_this_one
                 ]
-                is_overlapping_with_any = any([overlapping_area for overlapping_area in overlapping_areas if overlapping_area != 0])
+                is_overlapping_with_any = any(
+                    [
+                        overlapping_area
+                        for overlapping_area in overlapping_areas
+                        if overlapping_area != 0
+                    ]
+                )
 
                 if not is_overlapping_with_any:
                     candidates.append(Candidate(rectangle, possible_candidate))
             elif example_feature_value > bounds.upper:
-                this_rectangle_feature_bounds[feature] = Bounds(bounds.lower, example_feature_value)
+                this_rectangle_feature_bounds[feature] = Bounds(
+                    bounds.lower, example_feature_value
+                )
                 possible_candidate = Rectangle(this_rectangle_feature_bounds)
 
                 overlapping_areas = [
-                    calculate_overlapping_area(possible_candidate, other_rect) for other_rect in
-                    rectangles_without_this_one
+                    calculate_overlapping_area(possible_candidate, other_rect)
+                    for other_rect in rectangles_without_this_one
                 ]
                 is_overlapping_with_any = any(
-                    [overlapping_area for overlapping_area in overlapping_areas if overlapping_area != 0])
+                    [
+                        overlapping_area
+                        for overlapping_area in overlapping_areas
+                        if overlapping_area != 0
+                    ]
+                )
 
                 if not is_overlapping_with_any:
                     candidates.append(Candidate(rectangle, possible_candidate))
@@ -206,9 +271,15 @@ def find_possible_extensions(rectangles: Collection[Rectangle], single_example) 
 def shrink_on_biggest_feature(rect1: Rectangle, rect2: Rectangle):
     considered_features = pipe(
         rect1.feature_by_bounds.keys(),
-        filter(lambda feature: not rect1.feature_by_bounds[feature].inside(rect2.feature_by_bounds[feature])
-                               or not rect2.feature_by_bounds[feature].inside(rect1.feature_by_bounds[feature])),
-        list
+        filter(
+            lambda feature: not rect1.feature_by_bounds[feature].inside(
+                rect2.feature_by_bounds[feature]
+            )
+            or not rect2.feature_by_bounds[feature].inside(
+                rect1.feature_by_bounds[feature]
+            )
+        ),
+        list,
     )
 
     if len(considered_features) == 0:
@@ -218,14 +289,16 @@ def shrink_on_biggest_feature(rect1: Rectangle, rect2: Rectangle):
     rect2_feature_ranges = rect2.get_feature_by_bounds_range()
 
     summed_feature_ranegs = {
-        feature: rect1_feature_ranges[feature] + rect2_feature_ranges[feature] for feature in considered_features
+        feature: rect1_feature_ranges[feature] + rect2_feature_ranges[feature]
+        for feature in considered_features
     }
 
-    feature_to_split_on = sorted(summed_feature_ranegs, key=summed_feature_ranegs.get, reverse=True)[0]
+    feature_to_split_on = sorted(
+        summed_feature_ranegs, key=summed_feature_ranegs.get, reverse=True
+    )[0]
 
     rect1_bounds = rect1.feature_by_bounds[feature_to_split_on]
     rect2_bounds = rect2.feature_by_bounds[feature_to_split_on]
-
 
     if rect1_bounds.inside(rect2_bounds):
         split_point = np.mean([rect1_bounds.lower, rect1_bounds.upper])
@@ -260,7 +333,10 @@ def shrink_on_biggest_feature(rect1: Rectangle, rect2: Rectangle):
         rect1_bounds.lower = split_point
         rect2_bounds.upper = split_point
 
-    if rect1_bounds.upper < rect1_bounds.lower or rect2_bounds.upper < rect2_bounds.lower:
+    if (
+        rect1_bounds.upper < rect1_bounds.lower
+        or rect2_bounds.upper < rect2_bounds.lower
+    ):
         logging.error("WRONG BOUNDS")
         logging.error(rect1_bounds)
         logging.error(rect2_bounds)
@@ -355,6 +431,7 @@ def test_shrink_on_biggest_feature_2():
     assert rect2.feature_by_bounds[1] == Bounds(-5, 2)
     assert rect1.feature_by_bounds[1] == Bounds(2, 6)
 
+
 def test_shrink_on_biggest_feature_3():
     rect1 = Rectangle({1: Bounds(0, 6)})
     rect2 = Rectangle({1: Bounds(3, 6)})
@@ -363,6 +440,7 @@ def test_shrink_on_biggest_feature_3():
 
     assert rect1.feature_by_bounds[1] == Bounds(0, 4.5)
     assert rect2.feature_by_bounds[1] == Bounds(4.5, 6)
+
 
 def test_shrink_on_biggest_feature_4():
     rect1 = Rectangle({1: Bounds(0, 10)})
@@ -423,6 +501,7 @@ def test_shrinkage():
     assert len(new_rules) == 2
     assert rect1, rect2 in new_rules
 
+
 def test_shrinkage_2():
     rect1 = Rectangle({1: Bounds(0, 10)})
     rect2 = Rectangle({1: Bounds(1, 11)})
@@ -433,6 +512,7 @@ def test_shrinkage_2():
     assert rect1.feature_by_bounds == {1: Bounds(0, 5.5)}
     assert rect2.feature_by_bounds == {1: Bounds(5.5, 11)}
 
+
 def test_shrinkage_3():
     rect1 = Rectangle({1: Bounds(0, 4)})
     rect2 = Rectangle({1: Bounds(-2, 2)})
@@ -442,6 +522,7 @@ def test_shrinkage_3():
     assert len(new_rules) == 2
     assert rect1.feature_by_bounds == {1: Bounds(1, 4)}
     assert rect2.feature_by_bounds == {1: Bounds(-2, 1)}
+
 
 def test_shrinkage_4():
     rect1 = Rectangle({1: Bounds(2, 4)})
@@ -473,5 +554,3 @@ def test_extend():
     assert len(new_rectangles) == 2
     assert Rectangle({0: Bounds(0, 5)}) in new_rectangles
     assert Rectangle({0: Bounds(6, 8)}) in new_rectangles
-
-

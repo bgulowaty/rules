@@ -1,13 +1,17 @@
 [tool.poetry]
-name = "rules-classification"
+name = "x-to-rules"
 version = "0.1.0"
-description = ""
+description = "Explainability library"
 authors = ["Bogdan Gulowaty <b.gulowaty@gmail.com>"]
-include = ["rules"]
+packages = [
+    { include = "rules" },
+]
+
+[tool.pytest.ini_options]
+python_files = "*.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-rules-api = { path = "../rules-api" }
 numpy = "^1.20.1"
 pandas = "^1.2.3"
 deap = "^1.3.1"
@@ -17,8 +21,19 @@ pytest = "^6.2.2"
 joblib = "^1.0.1"
 sklearn = "^0.0"
 loguru = "^0.5.3"
+networkx = "^2.5"
+attrs = "^21.2.0"
+frozendict = "^2.0.6"
 
 [tool.poetry.dev-dependencies]
+jupyterlab = "^3.1.9"
+pylint = "^2.10.2"
+flake8 = "^3.9.2"
+black = "^21.7b0"
+isort = "^5.9.3"
+yapf = "^0.31.0"
+mypy = "^0.910"
+MonkeyType = "^21.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

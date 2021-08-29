@@ -10,7 +10,10 @@ def get_all_possible_expression_addresses(expr, current_address=None):
 
     for node_idx, node_expr in enumerate(expr.args):
         current_node_address = [*current_address, node_idx]
-        addresses = [*addresses, *get_all_possible_expression_addresses(node_expr, current_node_address)]
+        addresses = [
+            *addresses,
+            *get_all_possible_expression_addresses(node_expr, current_node_address),
+        ]
 
     return addresses
 
@@ -39,14 +42,22 @@ def modify_expression(expr, modifier, address):
             return expr.func(*largs, 2)
     else:
         largs = list(expr.args)
-        largs[address[0]] = modify_expression(expr.args[address[0]], modifier, address[1:])
+        largs[address[0]] = modify_expression(
+            expr.args[address[0]], modifier, address[1:]
+        )
         new = expr.func(*largs)
     return new
 
+
 def test_modify_expression_prod():
     from sympy import symbols
-    balanced_accuracy = symbols('balanced_accuracy')
-    b = symbols('b')
-    d = symbols('d')
-    s = symbols('s')
-    modify_expression(b**(d*s)*balanced_accuracy**balanced_accuracy + d, lambda expr: None, [1,1,1])
+
+    balanced_accuracy = symbols("balanced_accuracy")
+    b = symbols("b")
+    d = symbols("d")
+    s = symbols("s")
+    modify_expression(
+        b ** (d * s) * balanced_accuracy ** balanced_accuracy + d,
+        lambda expr: None,
+        [1, 1, 1],
+    )

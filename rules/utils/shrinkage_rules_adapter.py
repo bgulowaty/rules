@@ -20,16 +20,15 @@ class ShrinkageAdapter:
             bounds_by_feature = {}
             for feature, statements in rule.get_statements_by_feature().items():
                 sorted_thresholds = pipe(
-                    statements,
-                    map(lambda s: s.threshold),
-                    sorted,
-                    list
+                    statements, map(lambda s: s.threshold), sorted, list
                 )
 
                 if len(sorted_thresholds) != 2:
                     raise Exception("Not supported")
 
-                bounds_by_feature[feature] = Bounds(sorted_thresholds[0], sorted_thresholds[1])
+                bounds_by_feature[feature] = Bounds(
+                    sorted_thresholds[0], sorted_thresholds[1]
+                )
 
             rect = Rectangle(bounds_by_feature)
             rects.append(rect)
@@ -46,7 +45,11 @@ class ShrinkageAdapter:
                 statements.append(Statement(feature, Relation.MT, bound.lower))
                 statements.append(Statement(feature, Relation.LEQ, bound.upper))
 
-            labeling = self.rect_by_labeling[rect] if rect in self.rect_by_labeling else self.default_class
+            labeling = (
+                self.rect_by_labeling[rect]
+                if rect in self.rect_by_labeling
+                else self.default_class
+            )
             rules.append(Rule(statements, labeling))
 
         return rules
