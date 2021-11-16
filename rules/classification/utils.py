@@ -30,3 +30,4 @@ def same_label(rule, y):
     return {
         idx for idx, y_single in enumerate(y) if rule.distribution_or_class == y_single
     }
+
