@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from itertools import groupby
 
-from frozendict import frozendict
 from toolz.curried import filter, pipe, map
 from enum import Enum
 from typing import List, Tuple, Optional, Set, Dict, Collection, Iterable
@@ -13,7 +12,7 @@ from attr import attrs, attrib
 
 @attrs(eq=True, hash=True)
 class Example:
-    value_by_feature: Dict[Feature, any] = attrib(converter=frozendict)
+    value_by_feature: Dict[Feature, any] = attrib(converter=dict)
     label: Optional[any] = attrib()
 
     def get_feature_values(self):
