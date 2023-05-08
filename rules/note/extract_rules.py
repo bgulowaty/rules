@@ -7,7 +7,6 @@ from attr import attrs, attrib
 
 from rules.api import DecisionTree, Rule, Statement, Relation
 
-
 @attrs(frozen=True, eq=False)
 class SkLearnDecisionTree(DecisionTree):
     _skLearnTree: DecisionTreeClassifier = attrib()

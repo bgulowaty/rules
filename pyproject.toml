@@ -19,11 +19,11 @@ sympy = "^1.7.1"
 toolz = "^0.11"
 pytest = "^7.1"
 joblib = "^1.0"
-sklearn = "^0.0"
 loguru = "0.6"
 networkx = "^2.5"
 attrs = "^21.2"
 frozendict = "^2.2"
+scikit-learn = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = "^3.1.9"
