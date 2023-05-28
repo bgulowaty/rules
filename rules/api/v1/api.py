@@ -27,6 +27,12 @@ class Statement:
     relation: Relation
     threshold: float
 
+    def with_threshold(self, threshold):
+        return Statement(self.feature_idx, self.relation, threshold)
+
+    def with_relation(self, relation):
+        return Statement(self.feature_idx, relation, self.threshold)
+
     def contains(self, value: float) -> bool:
         if self.relation is Relation.LEQ:
             return value <= self.threshold
